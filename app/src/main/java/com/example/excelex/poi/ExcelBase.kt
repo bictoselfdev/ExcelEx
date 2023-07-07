@@ -132,24 +132,30 @@ abstract class ExcelBase {
         RegionUtil.setBorderRight(cell.cellStyle.borderRight, cellRangeAddress, sheet)
     }
 
-    fun setCellImage(sheet: Sheet, rowIndex: Int, columnIndex: Int, bitmap: Bitmap) {
-        val drawing = sheet.createDrawingPatriarch() as XSSFDrawing
+    fun setCellImage(sheet: Sheet, rowStartIndex: Int, rowEndIndex: Int, columnStartIndex: Int, columnEndIndex: Int, bitmap: Bitmap) {
+
+        // Convert bitmap to byte array
         val stream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        val imageData = stream.toByteArray()
 
-        // Converting input stream into byte array
-        val inputImagePictureID = xssfWorkbook.addPicture(stream.toByteArray(), Workbook.PICTURE_TYPE_PNG)
+        // Add picture to the workbook. (Picture is assigned unique ID)
+        val pictureID = xssfWorkbook.addPicture(imageData, Workbook.PICTURE_TYPE_PNG)
 
-        // Creating the client anchor based on file format
+        // Use 'ClientAnchor' to position on sheet.
         val helper = sheet.workbook.creationHelper
         val anchor = helper.createClientAnchor()
-        anchor.setCol1(columnIndex)
-        anchor.setCol2(columnIndex + 1)
-        anchor.row1 = rowIndex
-        anchor.row2 = rowIndex + 1
+        anchor.row1 = rowStartIndex
+        anchor.row2 = rowEndIndex
+        anchor.setCol1(columnStartIndex)
+        anchor.setCol2(columnEndIndex)
 
-        val picture = drawing.createPicture(anchor, inputImagePictureID)
-        //picture.resize() // java.lang.NoClassDefFoundError: Failed resolution of: java/awt/Dimension
+        // Attach picture to the sheet.
+        val drawing = sheet.createDrawingPatriarch() as XSSFDrawing
+        val picture = drawing.createPicture(anchor, pictureID)
+
+        // java.lang.NoClassDefFoundError: Failed resolution of: java/awt/Dimension
+         picture.resize()
     }
 
     fun setCellFormula(sheet: Sheet, rowIndex: Int, columnIndex: Int, formula: String) {

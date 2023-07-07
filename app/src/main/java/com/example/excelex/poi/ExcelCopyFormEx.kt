@@ -14,12 +14,12 @@ class ExcelCopyFormEx : ExcelBase() {
 
     override fun create(): Workbook {
         val inputStream = MainApplication.getContext().assets.open(ASSET_SAMPLE)
-        xssfWorkbook = XSSFWorkbook(inputStream)
+        xssfWorkbook = XSSFWorkbook(inputStream) // sample.xlsx 불러 오기
 
-        val sheetA = xssfWorkbook.cloneSheet(0, "홍길동")
+        val sheetA = xssfWorkbook.cloneSheet(0, "홍길동") // copy form
         addContentA(sheetA)
 
-        val sheetB = xssfWorkbook.cloneSheet(0, "홍길순")
+        val sheetB = xssfWorkbook.cloneSheet(0, "홍길순") // copy form
         addContentB(sheetB)
 
         //xssfWorkbook.removeSheetAt(0) // 양식 삭제
